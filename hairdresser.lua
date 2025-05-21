@@ -46,6 +46,7 @@ H = Hairdresser
 
 function init()
    public{thresh = 2}:range(0.1, 10)
+   public{boost  = 4}:range(1.5, 6)
 
    output[1].slew = 0.0007
    output[2].slew = 0.0007
@@ -57,7 +58,13 @@ function init()
    input[2]{mode = 'window'
 	    ,windows = {0, 1, 2, 3, 4}
 	    ,window = function(w)
-	       if w == 2 then
+	       if w == 1 then
+		  print("neg fold")
+		  input[1].mode('stream')
+		  input[1].stream = function(v)
+		     output[1].volts = H:fold(v*public.boost)
+		  end
+	       elseif w == 2 then
 		  print("fold")
 		  input[1].mode('stream')
 		  input[1].stream = function(v)
