@@ -1,9 +1,9 @@
 ---Hairdresser
 -- The essential hairdresser operations for crow
 -- → 1: signal
--- → 2: operation
+-- → 2: operation; negative boosted fold
 --   1: fold/wrap/clip/shampoo/rinse →
---   2:                shampoo      →
+--   2:                shampoo       →
 
 FREQ = 1/2222
 

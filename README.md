@@ -9,4 +9,4 @@ fold, wrap and clip your waves to add color and style
   2:                shampoo       →
 ```
 
-shampoo is sample, rinse is reset.
+shampoo is sample, rinse is reset. Negative at in2 for boosted wavefolding.
