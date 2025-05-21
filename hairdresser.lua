@@ -7,14 +7,51 @@
 
 FREQ = 1/2222
 
+Hairdresser = {}
+
+function Hairdresser:fold(v)
+   if v <= public.thresh and v >= -public.thresh then
+      return v
+   else
+      local t = public.thresh
+      if v < 0 then t = t*-1 end
+      return Hairdresser:fold(t - (v - t))
+   end
+end
+
+function Hairdresser:wrap(v)
+   if v <= public.thresh and v >= -public.thresh then
+      return v
+   else
+      local t = public.thresh
+      if v < 0 then t = t*-1 end
+      return Hairdresser:wrap(-t + (v-t))
+   end
+end
+
+function Hairdresser:clip(v)
+   local t = public.thresh
+   return math.max(-t, math.min(v, t))
+end
+
+function Hairdresser:shampoo(v)
+   return v
+end
+
+function Hairdresser:rinse()
+   return 0
+end
+
+H = Hairdresser
+
 function init()
-   public{t = 2} -- threshold
+   public{thresh = 2}:range(0.1, 10)
 
    output[1].slew = 0.0007
    output[2].slew = 0.0007
 
    input[1]{mode = 'stream'
-	    ,stream = function(v) output[1].volts = fold(v) end
+	    ,stream = function(v) output[1].volts = H:fold(v) end
 	    ,time = FREQ
 	   }
    input[2]{mode = 'window'
@@ -24,32 +61,32 @@ function init()
 		  print("fold")
 		  input[1].mode('stream')
 		  input[1].stream = function(v)
-		     output[1].volts = fold(v)
+		     output[1].volts = H:fold(v)
 		  end
 	       elseif w == 3 then
 		  print("wrap")
 		  input[1].mode('stream')
 		  input[1].stream = function(v)
-		     output[1].volts = wrap(v)
+		     output[1].volts = H:wrap(v)
 		  end
 	       elseif w == 4 then
 		  print("clip")
 		  input[1].mode('stream')
 		  input[1].stream = function(v)
-		     output[1].volts = clip(v)
+		     output[1].volts = H:clip(v)
 		  end
 	       elseif w == 5 then
 		  print("shampoo")
 		  input[1].stream = function(v)
-		     output[1].volts = shampoo(v)
-		     output[2].volts = shampoo(v)
+		     output[1].volts = H:shampoo(v)
+		     output[2].volts = H:shampoo(v)
 		     input[1].mode('none')
 		  end
 	       elseif w == 6 then
 		  print("rinse")
 		  input[1].mode('stream')
 		  input[1].stream = function(v)
-		     output[1].volts = rinse()
+		     output[1].volts = H:rinse()
 		  end
 	       else
 		  print("window "..w)
@@ -58,35 +95,5 @@ function init()
 	   }
 end
 
-function fold(v)
-   if v < public.t and v > -public.t then
-      return v
-   else
-      local t = public.t
-      if v < 0 then t = t*-1 end
-      return fold(t - (v - t))
-   end
-end
-
-function wrap(v)
-   if v < public.t and v > -public.t then
-      return v
-   else
-      local t = public.t
-      if v < 0 then t = t*-1 end
-      return wrap(-t + (v-t))
-   end
-end
-
-function clip(v)
-   local t = public.t
-   return math.max(-t, math.min(v, t))
-end
-
-function shampoo(v)
-   return v
-end
-
-function rinse()
-   return 0
-end
+-- erm, a cobbled mess because there is no require in druid
+return Hairdresser
