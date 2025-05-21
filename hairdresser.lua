@@ -2,7 +2,8 @@
 -- The essential hairdresser operations for crow
 -- → 1: signal
 -- → 2: operation
---   1: fold/wrap/clip →
+--   1: fold/wrap/clip/shampoo/rinse →
+--   2:                shampoo      →
 
 FREQ = 1/2222
 
@@ -17,17 +18,39 @@ function init()
 	    ,time = FREQ
 	   }
    input[2]{mode = 'window'
-	    ,windows = {0, 2, 4}
+	    ,windows = {0, 1, 2, 3, 4}
 	    ,window = function(w)
 	       if w == 2 then
 		  print("fold")
-		  input[1].stream = function(v) output[1].volts = fold(v) end
+		  input[1].mode('stream')
+		  input[1].stream = function(v)
+		     output[1].volts = fold(v)
+		  end
 	       elseif w == 3 then
 		  print("wrap")
-		  input[1].stream = function(v) output[1].volts = wrap(v) end
+		  input[1].mode('stream')
+		  input[1].stream = function(v)
+		     output[1].volts = wrap(v)
+		  end
 	       elseif w == 4 then
 		  print("clip")
-		  input[1].stream = function(v) output[1].volts = clip(v) end
+		  input[1].mode('stream')
+		  input[1].stream = function(v)
+		     output[1].volts = clip(v)
+		  end
+	       elseif w == 5 then
+		  print("shampoo")
+		  input[1].stream = function(v)
+		     output[1].volts = shampoo(v)
+		     output[2].volts = shampoo(v)
+		     input[1].mode('none')
+		  end
+	       elseif w == 6 then
+		  print("rinse")
+		  input[1].mode('stream')
+		  input[1].stream = function(v)
+		     output[1].volts = rinse()
+		  end
 	       else
 		  print("window "..w)
 	       end
@@ -58,4 +81,12 @@ end
 function clip(v)
    local t = public.t
    return math.max(-t, math.min(v, t))
+end
+
+function shampoo(v)
+   return v
+end
+
+function rinse()
+   return 0
 end
